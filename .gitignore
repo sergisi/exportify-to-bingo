@@ -8,3 +8,8 @@ playlists/
 dist/
 build/
 *.spec
+venv
+bingo_template.aux
+bingo_template.log
+bingo_template.pdf
+tex/**

@@ -1,0 +1,34 @@
+\documentclass[a4paper]{article}
+
+\begin{document}
+{% for bingo in bingos %}
+    \begin{tabular}[c]{|c|c|c|}
+      \hline
+{% for line in bingo.lines %}
+  {%+ for track in line.tracks +%}
+    \parbox[c][2cm][c]{4cm}{ 
+      \Large {{ track | replace('&', '\&') }} 
+  }
+    {%+ if not loop.last +%}
+    &
+    {% endif %}
+    {% endfor %}
+  \\
+  {%+ for artist in line.artists +%}
+    \parbox[c][2cm][c]{4cm}{ 
+{{ artist | replace('&', '\&') | replace(',', ', ') }}
+    }
+    {%+ if not loop.last +%}
+    &
+    {% endif %}
+    {% endfor %}
+  \\
+  \hline
+{% endfor %}
+    \end{tabular}
+
+
+
+{% endfor %}
+
+\end{document}
