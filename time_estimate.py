@@ -3,6 +3,7 @@ Time estimation of a musical bingo
 """
 import math
 import itertools
+import functools
 
 def p(songs_played: int, card_size: int, playlist_size: int) -> float:
     """
@@ -21,8 +22,17 @@ def expected_value(bingo_cards: int, card_size: int, playlist_size: int) -> floa
 
     return sum(ti * res for ti,res in enumerate(it2, start=card_size))
 
-card_size = 9
-playlist_size = 100
-bingo_cards = 300
 
-print()
+def bisect_algorithm(f, start, end, target=0) -> int:
+    assert f(start) < target
+    assert f(end) > target
+    for _ in range(32):
+        midp = (start + end) // 2
+        if f(midp) < target:
+            start = midp
+        else:
+            end = midp
+    return start
+
+
+
