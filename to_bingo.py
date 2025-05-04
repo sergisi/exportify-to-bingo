@@ -13,9 +13,13 @@ filename = os.path.join(root, 'tex', 'bingo_template.tex')
 
 
 @dto.dataclass
+class Song:
+    track: str
+    artist: str
+
+@dto.dataclass
 class Line:
-    tracks: list[str]
-    artists: list[str]
+    songs: list[Song]
 
 @dto.dataclass
 class BingoCard:
@@ -44,17 +48,28 @@ def gen_bingo_card(rows: int, columns: int) -> BingoCard:
                   .itertuples())
     lines = []
     for r in it.batched(bingo_card, n=columns):
-        tracks = []
-        artists = []
+        songs = []
         for track in r:
-            tracks.append(track._1)
-            artists.append(track._2)
-        lines.append(Line(tracks=tracks, artists=artists))
+            songs.append(Song(track._1, track._2))
+        lines.append(Line(songs=songs))
     return BingoCard(lines=lines)
-        
+
+
+def create_bingos(cards: int, rows: int, columns: int) -> list[BingoCard]:
+    """
+    Does not guarantee the number of bingo cards generated, as
+    they must be different. But, if the list of songs is large 
+    enough, it's almost guanrateed.
+    """
+    bingos = set()
+    for _ in range(cards * 2):
+        bingos.add(gen_bingo_card(rows, columns))
+        if len(bingos) >= cards:
+            return list(bingos)
+    return list(bingos)
 
 def main(cards: int, rows: int, columns: int):
-    bingos = [gen_bingo_card(rows, columns) for _ in range(cards)]
+    bingos = create_bingos(cards, rows, columns)
     process_template(bingos)
 
 
