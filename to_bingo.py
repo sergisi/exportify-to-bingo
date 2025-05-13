@@ -1,32 +1,28 @@
 import pandas as pd
+import typer
 import functools as fun
 import itertools as it
-from jinja2 import Environment, FileSystemLoader
+from jinja2 import Environment, FileSystemLoader, Template
 import os
 import dataclasses as dto
 
-root = os.path.dirname(os.path.abspath(__file__))
-templates_dir = os.path.join(root, 'templates')
-env = Environment( loader = FileSystemLoader(templates_dir) )
-template = env.get_template('bingo_template.tex')
-filename = os.path.join(root, 'tex', 'bingo_template.tex')
 
-
-@dto.dataclass
+@dto.dataclass(frozen=True)
 class Song:
     track: str
     artist: str
 
-@dto.dataclass
+@dto.dataclass(frozen=True)
 class Line:
-    songs: list[Song]
+    songs: tuple[Song]
 
-@dto.dataclass
+@dto.dataclass(frozen=True)
 class BingoCard:
-    lines: list[Line]
+    lines: tuple[Line]
 
 
-def process_template(bingos: list[BingoCard]):
+def process_template(bingos: list[BingoCard], filename: str, 
+                     template: Template):
     with open(filename, 'w') as fh:
         fh.write(template.render(
             bingos = bingos,
@@ -51,8 +47,8 @@ def gen_bingo_card(rows: int, columns: int) -> BingoCard:
         songs = []
         for track in r:
             songs.append(Song(track._1, track._2))
-        lines.append(Line(songs=songs))
-    return BingoCard(lines=lines)
+        lines.append(Line(songs=tuple(songs)))
+    return BingoCard(lines=tuple(lines))
 
 
 def create_bingos(cards: int, rows: int, columns: int) -> list[BingoCard]:
@@ -68,10 +64,21 @@ def create_bingos(cards: int, rows: int, columns: int) -> list[BingoCard]:
             return list(bingos)
     return list(bingos)
 
-def main(cards: int, rows: int, columns: int):
+def main(cards: int, 
+         rows: int, 
+         columns: int,
+         template_name: str = 'bingo_template.tex'
+         ):
+    root = os.path.dirname(os.path.abspath(__file__))
+    templates_dir = os.path.join(root, 'templates')
+    env = Environment( loader = FileSystemLoader(templates_dir) )
+    template = env.get_template(template_name)
+    filename = os.path.join(root, 'tex', 'bingo_template.tex')
+
+
     bingos = create_bingos(cards, rows, columns)
-    process_template(bingos)
+    process_template(bingos, filename, template)
 
 
 if __name__ == '__main__':
-    main(3, 3, 3)
+    typer.run(main)

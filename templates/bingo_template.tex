@@ -1,34 +1,32 @@
 \documentclass[a4paper]{article}
+\usepackage[margin=1cm]{geometry}
 
 \begin{document}
 {% for bingo in bingos %}
-    \begin{tabular}[c]{|c|c|c|}
-      \hline
-{% for line in bingo.lines %}
-  {%+ for track in line.tracks +%}
-    \parbox[c][2cm][c]{4cm}{ 
-      \Large {{ track | replace('&', '\&') }} 
-  }
-    {%+ if not loop.last +%}
-    &
-    {% endif %}
-    {% endfor %}
-  \\
-  {%+ for artist in line.artists +%}
-    \parbox[c][2cm][c]{4cm}{ 
-{{ artist | replace('&', '\&') | replace(',', ', ') }}
-    }
-    {%+ if not loop.last +%}
-    &
-    {% endif %}
-    {% endfor %}
-  \\
+  \begin{tabular}[c]{|c|c|c|c|c|}
   \hline
-{% endfor %}
-    \end{tabular}
-
-
-
+  {% for line in bingo.lines %}
+    {%+ for song in line.songs +%}
+      \parbox[c][2cm][c]{3cm}{ 
+        \Large{  {{ song.track | replace('&', '\&') }} }
+      }{%+ if not loop.last +%} & {% endif %}
+    {% endfor %}
+    {#  
+      \\
+      {%+ for song in line.songs +%}
+        \parbox[c][2cm][c]{4cm}{ 
+        {{ song.artist | replace('&', '\&') | replace(',', ', ') }}
+        }
+        {%+ if not loop.last +%}
+          &
+        {% endif %}
+      {% endfor %}
+    #}
+    \\
+    \hline
+  {% endfor %}
+  \end{tabular}
+  \vspace{1em}
 {% endfor %}
 
 \end{document}
