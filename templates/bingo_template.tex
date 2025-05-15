@@ -7,8 +7,8 @@
   \hline
   {% for line in bingo.lines %}
     {%+ for song in line.songs +%}
-      \parbox[c][2cm][c]{3cm}{ 
-        \Large{  {{ song.track | replace('&', '\&') }} }
+      \parbox[c][2cm][c]{3cm}{ \centering
+        \large{  {{ song.track | replace('&', '\&') }} }
       }{%+ if not loop.last +%} & {% endif %}
     {% endfor %}
     {#  

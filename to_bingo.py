@@ -14,11 +14,11 @@ class Song:
 
 @dto.dataclass(frozen=True)
 class Line:
-    songs: tuple[Song]
+    songs: frozenset[Song]
 
 @dto.dataclass(frozen=True)
 class BingoCard:
-    lines: tuple[Line]
+    lines: frozenset[Line]
 
 
 def process_template(bingos: list[BingoCard], filename: str, 
@@ -38,6 +38,7 @@ def gen_bingo_card(rows: int, columns: int) -> BingoCard:
         Creates a single bingo card
     """
     # NOTE: Creates a single bingo card
+    # FIX: Desordenacions del bingo?
     data = get_data()
     bingo_card = (data[['Track Name', 'Artist Name(s)']]
                   .sample(rows * columns)
@@ -47,8 +48,22 @@ def gen_bingo_card(rows: int, columns: int) -> BingoCard:
         songs = []
         for track in r:
             songs.append(Song(track._1, track._2))
-        lines.append(Line(songs=tuple(songs)))
-    return BingoCard(lines=tuple(lines))
+        lines.append(Line(songs=frozenset(songs)))
+    return BingoCard(lines=frozenset(lines))
+
+
+def marc_create_bingos(cards: int, rows: int, columns: int) -> list[BingoCard]:
+    """
+    Does not guarantee the number of bingo cards generated, as
+    they must be different. But, if the list of songs is large 
+    enough, it's almost guanrateed.
+    """
+    bingos = []
+    while len(bingos) >= cards:
+        bingo = gen_bingo_card(rows, columns)
+        if bingo not in bingos:
+            bingos.append(bingo)
+    return list(bingos)
 
 
 def create_bingos(cards: int, rows: int, columns: int) -> list[BingoCard]:
