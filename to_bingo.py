@@ -82,13 +82,13 @@ def create_bingos(cards: int, rows: int, columns: int) -> list[BingoCard]:
 def main(cards: int, 
          rows: int, 
          columns: int,
-         template_name: str = 'bingo_template.tex'
+         template_name: str = 'bingo_template.html'
          ):
     root = os.path.dirname(os.path.abspath(__file__))
     templates_dir = os.path.join(root, 'templates')
     env = Environment( loader = FileSystemLoader(templates_dir) )
     template = env.get_template(template_name)
-    filename = os.path.join(root, 'tex', 'bingo_template.tex')
+    filename = os.path.join(root, 'html', 'bingo_template.html')
 
 
     bingos = create_bingos(cards, rows, columns)

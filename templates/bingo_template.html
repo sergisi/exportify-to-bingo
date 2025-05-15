@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bingo Cards</title>
+    <style>
+table, th, td {
+  border: 1px solid;
+  border-collapse: collapse;
+  margin-top: 1em;
+}
+table {
+    table-layout: fixed;
+    width: 50em;
+}
+
+td {
+    padding: 1em;
+    height: 2cm;
+}
+    </style>
+</head>
+
+<body>
+    {% for bingo in bingos %}
+    <table>
+        {% for line in bingo.lines %}
+        <tr>
+            {% for song in line.songs %}
+            <td> {{ song.track }}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+    {% endfor %}
+</body>
+
+</html>
