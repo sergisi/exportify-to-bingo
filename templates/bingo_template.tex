@@ -1,32 +1,28 @@
-\documentclass[a4paper]{article}
-\usepackage[margin=1cm]{geometry}
+\documentclass[landscape]{article}
+\usepackage[a6paper, margin=0pt]{geometry}
+\setlength{\parindent}{0pt}
 
 \begin{document}
+\pagenumbering{gobble}
 {% for bingo in bingos %}
+  \vspace*{5mm}
+  \begin{center}
+  \Huge{Sant Joan al Barri}
+\end{center}
+
   \begin{tabular}[c]{|c|c|c|c|c|}
   \hline
   {% for line in bingo.lines %}
     {%+ for song in line.songs +%}
-      \parbox[c][2cm][c]{3cm}{ \centering
-        \large{  {{ song.track | replace('&', '\&') }} }
+      \parbox[c][25.351mm][c]{25.351mm}{ \centering
+        \large{  {{ song | replace('&', '\&') }} }
       }{%+ if not loop.last +%} & {% endif %}
     {% endfor %}
-    {#  
-      \\
-      {%+ for song in line.songs +%}
-        \parbox[c][2cm][c]{4cm}{ 
-        {{ song.artist | replace('&', '\&') | replace(',', ', ') }}
-        }
-        {%+ if not loop.last +%}
-          &
-        {% endif %}
-      {% endfor %}
-    #}
     \\
     \hline
   {% endfor %}
   \end{tabular}
-  \vspace{1em}
+  \newpage
 {% endfor %}
 
 \end{document}

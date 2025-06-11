@@ -1,4 +1,5 @@
 import pandas as pd
+import random
 import typer
 import functools as fun
 import itertools as it
@@ -8,17 +9,12 @@ import dataclasses as dto
 
 
 @dto.dataclass(frozen=True)
-class Song:
-    track: str
-    artist: str
-
-@dto.dataclass(frozen=True)
 class Line:
-    songs: frozenset[Song]
+    songs: list[str]
 
 @dto.dataclass(frozen=True)
 class BingoCard:
-    lines: frozenset[Line]
+    lines: list[Line]
 
 
 def process_template(bingos: list[BingoCard], filename: str, 
@@ -33,37 +29,29 @@ def get_data():
     return pd.read_csv('playlist.csv')
 
 
-def gen_bingo_card(rows: int, columns: int) -> BingoCard:
+def gen_bingo_card(rows: int, columns: int) -> frozenset[str]:
     """
         Creates a single bingo card
     """
     # NOTE: Creates a single bingo card
-    # FIX: Desordenacions del bingo?
     data = get_data()
-    bingo_card = (data[['Track Name', 'Artist Name(s)']]
+    bingo_card = (data
                   .sample(rows * columns)
+                  .sort_index()
                   .itertuples())
+    return frozenset(track._1 for track in bingo_card)
+
+
+def transform(bingo_card: frozenset[str], columns: int) -> BingoCard:
     lines = []
-    for r in it.batched(bingo_card, n=columns):
+    bingo_list = list(bingo_card)
+    random.shuffle(bingo_list)
+    for r in it.batched(bingo_list, n=columns):
         songs = []
         for track in r:
-            songs.append(Song(track._1, track._2))
-        lines.append(Line(songs=frozenset(songs)))
-    return BingoCard(lines=frozenset(lines))
-
-
-def marc_create_bingos(cards: int, rows: int, columns: int) -> list[BingoCard]:
-    """
-    Does not guarantee the number of bingo cards generated, as
-    they must be different. But, if the list of songs is large 
-    enough, it's almost guanrateed.
-    """
-    bingos = []
-    while len(bingos) >= cards:
-        bingo = gen_bingo_card(rows, columns)
-        if bingo not in bingos:
-            bingos.append(bingo)
-    return list(bingos)
+            songs.append(track)
+        lines.append(Line(songs=songs))
+    return BingoCard(lines=lines)
 
 
 def create_bingos(cards: int, rows: int, columns: int) -> list[BingoCard]:
@@ -76,19 +64,19 @@ def create_bingos(cards: int, rows: int, columns: int) -> list[BingoCard]:
     for _ in range(cards * 2):
         bingos.add(gen_bingo_card(rows, columns))
         if len(bingos) >= cards:
-            return list(bingos)
-    return list(bingos)
+            break
+    return [transform(bingo, columns) for bingo in bingos]
 
 def main(cards: int, 
          rows: int, 
          columns: int,
-         template_name: str = 'bingo_template.html'
+         template_name: str = 'bingo_template.tex'
          ):
     root = os.path.dirname(os.path.abspath(__file__))
     templates_dir = os.path.join(root, 'templates')
     env = Environment( loader = FileSystemLoader(templates_dir) )
     template = env.get_template(template_name)
-    filename = os.path.join(root, 'html', 'bingo_template.html')
+    filename = os.path.join(root, 'tex', 'bingo_template.tex')
 
 
     bingos = create_bingos(cards, rows, columns)
@@ -97,3 +85,4 @@ def main(cards: int,
 
 if __name__ == '__main__':
     typer.run(main)
+
